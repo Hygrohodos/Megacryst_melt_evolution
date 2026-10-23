@@ -10,3 +10,7 @@ The calculation is in `olivine-fc-dfc.ts`. It is the browser port of the SD2 spr
 - `meltFromOlivineMargin` rebuilds the DFC starting melt from the FC olivine at a chosen F.
 
 Used by the Hygrohodos workshop (Megacryst → Fractional Crystallization / Digestion-Fractional Crystallization).
+
+## Version
+
+`olivine-fc-dfc.ts` matches Hygrohodos website commit 1c28811 (`src/lib/olivine-fc-dfc.ts`, byte-identical; the file has not changed on the site since 05463f5). This includes the WEB-008 DFC fix (website 7ec414f): the r ≈ 1 step now uses a stable log1p form instead of returning the previous concentration.

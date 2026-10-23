@@ -300,8 +300,18 @@ export function runDfc(melt: DfcMelt): { ol_mg_num: number; ol_ni_ppm: number }[
     const olPrev = olivineFromLiquid(melt.kd, mgoL, feoL);
     const niS = niL * melt.dni;
     const afc = (cOld: number, cA: number, cS: number) => {
-      if (Math.abs(melt.r - 1) < 1e-12 || fOld <= 0 || fNew <= 0) return cOld;
-      return cOld + ((melt.r * cA - melt.r * cOld + cOld - cS) / (melt.r - 1)) * Math.log(fNew / fOld);
+      if (fOld <= 0 || fNew <= 0) return cOld;
+      const r = melt.r;
+      const dr = r - 1;
+      const num = r * cA - r * cOld + cOld - cS;
+      // Stable q = ln(fNew/fOld)/(r-1). At r=1, fNew=fOld so q = h/op
+      // (h = dmLiq, op = melt mass before the step). Series of log1p(dr*z)/dr.
+      const op = mMelt - dr * dmLiq;
+      const z = op > 0 && dmLiq > 0 ? dmLiq / op : 0;
+      const q = Math.abs(dr) < 1e-6
+        ? z * (1 - dr * z / 2 + dr * dr * z * z / 3)
+        : Math.log1p(dr * z) / dr;
+      return cOld + num * q;
     };
     mgoL = afc(mgoL, assim.mgo, olPrev.mgo_s);
     feoL = afc(feoL, assim.feo, olPrev.feo_s);
